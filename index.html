@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Rastro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232036E0'/%3E%3Cpath d='M7 22 C13 22 12 10 18 10 S22 16 25 16' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDF2; --surface:#fff; --soft:#F3F5F8; --ink:#0F1720; --muted:#5B6675; --line:#D5DBE3;
+  --accent:#2036E0; --accent-soft:#E6E9FC; --green:#0A8F63; --amber:#C77700; --red:#C4321F;
+  --o-ctwa:#2036E0; --o-site:#0A8F63; --o-link:#D98200; --o-direct:#8A94A3;
+  --display:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif;
+  --text:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--text);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:-.01em}
+h1{font-size:26px;line-height:1.15}
+h2{font-size:18px}
+a{color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ───── estrutura ───── */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:22px 14px;background:var(--ink);color:#fff}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 10px 22px;font:700 22px var(--display);letter-spacing:-.02em}
+.brand svg{flex:none}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;color:#C9D1DC;text-decoration:none;font-weight:500}
+.nav a:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a[aria-current=page]{background:#fff;color:var(--ink)}
+.nav svg{width:18px;height:18px;flex:none}
+.side .out{margin-top:auto}
+.side .out button{width:100%;text-align:left;background:none;border:0;color:#9AA6B5;padding:9px 10px;border-radius:8px;cursor:pointer}
+.side .out button:hover{background:rgba(255,255,255,.07);color:#fff}
+main{padding:28px clamp(16px,3vw,40px) 64px;max-width:1240px;width:100%}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:20px}
+.top p{margin:4px 0 0;color:var(--muted)}
+
+/* ───── componentes ───── */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.pad{padding:20px}
+.panel>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:500;text-decoration:none;color:var(--ink)}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#1a2dc2}
+.btn.danger{color:var(--red)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn[disabled]{opacity:.55;cursor:default}
+input[type=text],input[type=password],input[type=search],input[type=date],input[type=url],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+label.f{display:block;font-weight:500;font-size:14px;margin-bottom:12px}
+label.f>span{display:block;margin-bottom:5px}
+label.f small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.seg{display:inline-flex;background:var(--bg);padding:3px;border-radius:9px;gap:2px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:500}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,32,.12)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 7px;border-radius:999px;background:var(--soft);border:1px solid var(--line);font-size:13px;white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--o-direct))}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toolbar .dates{display:flex;gap:6px;align-items:center}
+.toolbar input[type=date]{width:auto;padding:6px 8px}
+.empty{padding:36px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font:700 17px var(--display);margin-bottom:4px}
+.note{padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:#1b2a9c;margin-bottom:16px}
+.note.warn{background:#FFF1DA;color:#7a4a00}
+.note.bad{background:#FDE8E4;color:#8d2214}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+.stack{display:grid;gap:16px}
+
+/* ───── tabelas ───── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-weight:500;color:var(--muted);text-align:left;font-size:13px;padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+tbody tr[data-href]{cursor:pointer}
+tbody tr[data-href]:hover{background:var(--soft)}
+.cell-sub{display:block;color:var(--muted);font-size:13px}
+.bar{display:block;height:4px;border-radius:2px;background:var(--accent);margin-top:6px;min-width:2px}
+.trunc{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ───── visão geral ───── */
+.hero{padding:26px clamp(18px,3vw,32px) 22px}
+.hero h2{font-size:clamp(24px,3.4vw,36px);line-height:1.12;max-width:26ch}
+.hero h2 b{font-weight:700;color:var(--green)}
+.hero .sub{margin:10px 0 0;color:var(--muted)}
+.trailbox{margin-top:22px}
+.trailcap{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}
+.trail svg{display:block;width:100%;height:auto;max-height:260px}
+.trail .band{fill-opacity:.2;transition:fill-opacity .15s}
+.trail .band:hover{fill-opacity:.38}
+.trail .reveal{animation:reveal 1.1s cubic-bezier(.2,.7,.2,1) both}
+@keyframes reveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media (prefers-reduced-motion:reduce){.trail .reveal{animation:none}}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 22px;margin-top:16px}
+.legend div{display:grid;grid-template-columns:auto 1fr;gap:0 8px;align-items:baseline}
+.legend i{width:10px;height:10px;border-radius:3px;background:var(--c);align-self:center}
+.legend b{font-weight:600}
+.legend span{grid-column:2;color:var(--muted);font-size:13px}
+.chart{padding:16px 20px 12px}
+.chart h3{font-size:16px;margin-bottom:2px}
+.chart .legend2{display:flex;gap:14px;color:var(--muted);font-size:13px;margin-bottom:8px}
+.chart .legend2 i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:baseline}
+.chart svg{display:block;width:100%;height:auto}
+.axis{fill:var(--muted);font:11px var(--text)}
+
+/* ───── ficha do lead ───── */
+.lead-head{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.back{display:inline-block;margin-bottom:10px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--ink)}
+.lead-grid{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:16px;align-items:start}
+dl.kv{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 14px}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{margin:0;word-break:break-word}
+.tl{list-style:none;margin:0;padding:6px 20px 14px}
+.tl li{position:relative;padding:12px 0 12px 28px}
+.tl li::before{content:"";position:absolute;left:5px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl li:first-child::before{top:20px}
+.tl li:last-child::before{bottom:calc(100% - 20px)}
+.tl li:only-child::before{display:none}
+.tl li::after{content:"";position:absolute;left:0;top:17px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--muted)}
+.tl li.meta::after{background:var(--accent);border-color:var(--accent)}
+.tl li.money::after{background:var(--green);border-color:var(--green)}
+.tl li.bad::after{background:var(--red);border-color:var(--red)}
+.tl li.touch::after{border-color:#B6BFCB}
+.tl .t{font-weight:600}
+.tl .s{color:var(--muted);font-size:13px;word-break:break-word}
+.tl time{display:block;color:var(--muted);font-size:12px}
+
+/* ───── links, integrações ───── */
+.cols{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:16px;align-items:start}
+.codeblock{position:relative;background:var(--ink);color:#E6EBF2;border-radius:10px;padding:12px 84px 12px 14px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all;white-space:pre-wrap}
+.codeblock .btn{position:absolute;top:8px;right:8px}
+.status{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.status:last-child{border-bottom:0}
+.status i{width:10px;height:10px;border-radius:50%;background:var(--green);margin-top:6px}
+.status.off i{background:#B6BFCB}
+.status.bad i{background:var(--red)}
+.status span{grid-column:2;color:var(--muted);font-size:14px}
+details.log{border-bottom:1px solid var(--line);padding:10px 20px}
+details.log:last-child{border-bottom:0}
+details.log summary{cursor:pointer;display:flex;gap:12px;flex-wrap:wrap;align-items:baseline}
+details.log pre{margin:10px 0 2px;padding:12px;background:var(--soft);border-radius:8px;overflow:auto;max-height:320px;font-size:12px}
+.sect{padding:20px;border-bottom:1px solid var(--line)}
+.sect:last-child{border-bottom:0}
+.sect h3{font-size:16px;margin-bottom:6px}
+.sect p{margin:0 0 12px;color:var(--muted)}
+.sect .codeblock+.codeblock{margin-top:8px}
+.lbl{display:block;font-weight:500;margin:12px 0 4px;font-size:14px}
+
+/* ───── login ───── */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login .panel{width:min(380px,100%);padding:30px}
+.login .brand{color:var(--ink);padding:0 0 6px}
+.login p{margin:0 0 18px;color:var(--muted)}
+.err{color:var(--red);min-height:22px;margin:8px 0 0;font-size:14px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:9px;z-index:50;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;overflow-x:auto}
+  .brand{padding:0 8px 0 4px;font-size:20px}
+  .nav{flex-direction:row}
+  .nav a{padding:8px 10px;white-space:nowrap}
+  .nav svg{display:none}
+  .side .out{margin:0 0 0 auto}
+  .grid2,.lead-grid,.cols{grid-template-columns:1fr}
+  main{padding-top:20px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ═════════ utilidades ═════════ */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nf = new Intl.NumberFormat('pt-BR');
+const mf = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const int = (n) => nf.format(n || 0);
+const money = (n) => mf.format(n || 0);
+const pct = (n) => (n * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+const dt = (s) => new Date(s).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+const dshort = (s) => { const [y, m, d] = s.split('-'); return d + '/' + m; };
+const ymd = (d) => d.toLocaleDateString('en-CA');
+function fmtPhone(p) {
+  if (!p) return '';
+  const d = String(p);
+  if (/^55\d{11}$/.test(d)) return `+55 (${d.slice(2, 4)}) ${d.slice(4, 9)}-${d.slice(9)}`;
+  if (/^55\d{10}$/.test(d)) return `+55 (${d.slice(2, 4)}) ${d.slice(4, 8)}-${d.slice(8)}`;
+  return '+' + d;
+}
+
+const ORIGINS = {
+  ctwa: { label: 'Anúncio de WhatsApp', color: 'var(--o-ctwa)', hex: '#2036E0' },
+  site: { label: 'Site e páginas', color: 'var(--o-site)', hex: '#0A8F63' },
+  link: { label: 'Links rastreados', color: 'var(--o-link)', hex: '#D98200' },
+  direct: { label: 'Sem origem', color: 'var(--o-direct)', hex: '#8A94A3' },
+};
+const originOf = (k) => ORIGINS[k] || { label: k || 'Sem origem', color: 'var(--o-direct)', hex: '#8A94A3' };
+const chip = (k) => { const o = originOf(k); return `<span class="chip" style="--c:${o.color}"><i></i>${esc(o.label)}</span>`; };
+
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.hidden = true; }, 2600);
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (_) { /* ignora */ }
+    ta.remove();
+  }
+  toast('Copiado');
+}
+
+/* ═════════ API ═════════ */
+async function api(route, o = {}) {
+  const qs = new URLSearchParams({ r: route, ...(o.query || {}) });
+  const res = await fetch('/api/admin?' + qs, {
+    method: o.method || 'GET',
+    headers: o.body ? { 'Content-Type': 'application/json' } : undefined,
+    body: o.body ? JSON.stringify(o.body) : undefined,
+    credentials: 'same-origin',
+  });
+  if (res.status === 401) { renderLogin(); throw new Error('login'); }
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(j.error || 'Erro ' + res.status);
+  return j;
+}
+
+/* ═════════ estado ═════════ */
+const S = {
+  preset: '30',
+  from: null, to: null,
+  by: 'campaign',
+  leads: { rows: [], total: 0, f: { search: '', origin: '', status: '', dim: '', val: '' } },
+};
+function rangeFor(preset) {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - (preset === '1' ? 0 : parseInt(preset, 10) - 1));
+  return { from: ymd(from), to: ymd(to) };
+}
+function currentRange() {
+  if (S.preset === 'custom' && S.from && S.to) return { from: S.from, to: S.to };
+  return rangeFor(S.preset);
+}
+
+/* ═════════ ícones e casca ═════════ */
+const ICON = {
+  home: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 10 3l7 7M5 8.5V17h10V8.5"/></svg>',
+  users: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="7" r="3"/><path d="M2.5 17c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M14 4.5a2.8 2.8 0 0 1 0 5.2M15.5 12.8c1.6.5 2.6 1.8 3 4.2"/></svg>',
+  link: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8.5 11.5a3.2 3.2 0 0 0 4.5 0l3-3a3.2 3.2 0 0 0-4.5-4.5l-1 1M11.5 8.5a3.2 3.2 0 0 0-4.5 0l-3 3a3.2 3.2 0 0 0 4.5 4.5l1-1"/></svg>',
+  ads: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V8l11-4v12L3 12Zm0 0 2 5h2.5l-1.3-4.5M17 8.5v3"/></svg>',
+  plug: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 3v4M13 3v4M5 7h10v3a5 5 0 0 1-10 0V7ZM10 15v2"/></svg>',
+};
+const NAV = [
+  ['geral', 'Visão geral', 'home'],
+  ['leads', 'Leads', 'users'],
+  ['links', 'Links rastreados', 'link'],
+  ['anuncios', 'Anúncios', 'ads'],
+  ['integracoes', 'Integrações', 'plug'],
+];
+const LOGO = '<svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2036E0"/><path d="M7 22 C13 22 12 10 18 10 S22 16 25 16" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+
+function shell(active, html) {
+  $('#app').innerHTML = `
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">${LOGO}<span>rastro</span></div>
+      <nav class="nav" aria-label="Principal">
+        ${NAV.map(([k, label, ic]) => `<a href="#/${k}" ${k === active ? 'aria-current="page"' : ''}>${ICON[ic]}<span>${label}</span></a>`).join('')}
+      </nav>
+      <div class="out"><button data-act="logout" type="button">Sair</button></div>
+    </aside>
+    <main id="main">${html}</main>
+  </div>`;
+  window.scrollTo(0, 0);
+}
+
+function rangeBar() {
+  const r = currentRange();
+  const P = [['1', 'Hoje'], ['7', '7 dias'], ['30', '30 dias'], ['90', '90 dias']];
+  return `<div class="toolbar">
+    <div class="seg" role="group" aria-label="Período">
+      ${P.map(([k, l]) => `<button type="button" data-act="preset" data-v="${k}" aria-pressed="${S.preset === k}">${l}</button>`).join('')}
+    </div>
+    <div class="dates">
+      <label class="sr" for="d-from">De</label><input type="date" id="d-from" value="${r.from}" max="${ymd(new Date())}">
+      <span class="muted">a</span>
+      <label class="sr" for="d-to">Até</label><input type="date" id="d-to" value="${r.to}" max="${ymd(new Date())}">
+    </div>
+  </div>`;
+}
+
+/* ═════════ login ═════════ */
+function renderLogin() {
+  $('#app').innerHTML = `
+  <div class="login"><form class="panel" id="login-form" autocomplete="on">
+    <div class="brand">${LOGO}<span>rastro</span></div>
+    <p>De qual anúncio veio cada lead e cada venda.</p>
+    <label class="f"><span>Senha</span><input type="password" id="pw" autocomplete="current-password" autofocus required></label>
+    <button class="btn primary" style="width:100%" type="submit">Entrar</button>
+    <div class="err" id="login-err" role="alert"></div>
+  </form></div>`;
+  $('#login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('#login-form button'); btn.disabled = true;
+    try {
+      const res = await fetch('/api/auth?action=login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: $('#pw').value }) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j.error || 'Não foi possível entrar.');
+      route();
+    } catch (err) {
+      $('#login-err').textContent = err.message; btn.disabled = false; $('#pw').select();
+    }
+  });
+}
+
+/* ═════════ visão geral ═════════ */
+function trailSvg(origins) {
+  const W = 760, H = 230, bw = 16, x1 = 8, x2 = W - 8 - bw, gap = 6, top = 6, avail = H - top - 6;
+  const rows = ['ctwa', 'site', 'link', 'direct']
+    .map((k) => origins.find((o) => o.k === k) || { k, leads: 0, revenue: 0, buyers: 0 })
+    .concat(origins.filter((o) => !ORIGINS[o.k]))
+    .filter((o) => o.leads > 0 || o.revenue > 0);
+  const totalL = rows.reduce((a, o) => a + o.leads, 0);
+  const totalR = rows.reduce((a, o) => a + o.revenue, 0);
+  if (!rows.length) return '';
+  const place = (key, total) => {
+    const usable = avail - gap * Math.max(0, rows.filter((o) => o[key] > 0).length - 1);
+    let y = top; const out = {};
+    for (const o of rows) {
+      if (!(o[key] > 0)) continue;
+      const h = Math.max(5, (o[key] / total) * usable);
+      out[o.k] = [y, y + h]; y += h + gap;
+    }
+    return out;
+  };
+  const L = place('leads', totalL);
+  const R = totalR > 0 ? place('revenue', totalR) : {};
+  const xm = (x1 + bw + x2) / 2;
+  let bands = '', bars = '';
+  for (const o of rows) {
+    const col = originOf(o.k).hex;
+    const l = L[o.k], r = R[o.k];
+    if (l) bars += `<rect x="${x1}" y="${l[0]}" width="${bw}" height="${l[1] - l[0]}" rx="3" fill="${col}"/>`;
+    if (r) bars += `<rect x="${x2}" y="${r[0]}" width="${bw}" height="${r[1] - r[0]}" rx="3" fill="${col}"/>`;
+    if (l && r) {
+      const xa = x1 + bw, xb = x2;
+      bands += `<path class="band" fill="${col}" d="M${xa} ${l[0]} C${xm} ${l[0]} ${xm} ${r[0]} ${xb} ${r[0]} L${xb} ${r[1]} C${xm} ${r[1]} ${xm} ${l[1]} ${xa} ${l[1]} Z"><title>${esc(originOf(o.k).label)}: ${int(o.leads)} leads → ${money(o.revenue)}</title></path>`;
+    }
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ligação entre a origem dos leads e a receita de cada origem"><g class="reveal">${bands}</g>${bars}</svg>`;
+}
+
+function lineAreaSvg(days, key, color) {
+  const W = 380, H = 150, l = 34, r = 6, t = 8, b = 20;
+  const max = Math.max(1, ...days.map((d) => d[key]));
+  const x = (i) => l + (days.length === 1 ? (W - l - r) / 2 : (i * (W - l - r)) / (days.length - 1));
+  const y = (v) => t + (H - t - b) * (1 - v / max);
+  const pts = days.map((d, i) => `${x(i).toFixed(1)},${y(d[key]).toFixed(1)}`);
+  const area = `M${x(0)},${H - b} L${pts.join(' L')} L${x(days.length - 1)},${H - b} Z`;
+  const tick = (v) => `<line x1="${l}" x2="${W - r}" y1="${y(v)}" y2="${y(v)}" stroke="#E3E8EE"/><text class="axis" x="${l - 6}" y="${y(v) + 4}" text-anchor="end">${key === 'revenue' ? (v >= 1000 ? Math.round(v / 1000) + 'k' : Math.round(v)) : Math.round(v)}</text>`;
+  const dots = days.length <= 45 ? days.map((d, i) => `<circle cx="${x(i)}" cy="${y(d[key])}" r="${days.length > 20 ? 2 : 3}" fill="${color}"><title>${dshort(d.d)} · ${key === 'revenue' ? money(d[key]) : int(d[key]) + ' leads'}</title></circle>`).join('') : '';
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico por dia">${tick(max)}${tick(max / 2)}<line x1="${l}" x2="${W - r}" y1="${H - b}" y2="${H - b}" stroke="#C9D1DB"/>
+    <path d="${area}" fill="${color}" fill-opacity=".12"/><polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}
+    <text class="axis" x="${l}" y="${H - 5}">${dshort(days[0].d)}</text><text class="axis" x="${W - r}" y="${H - 5}" text-anchor="end">${dshort(days[days.length - 1].d)}</text></svg>`;
+}
+
+function barsSvg(days) {
+  const W = 380, H = 150, l = 34, r = 6, t = 8, b = 20;
+  const max = Math.max(1, ...days.map((d) => Math.max(d.leads, d.sales)));
+  const inner = W - l - r, bw = Math.max(2, Math.min(18, inner / days.length - 2));
+  const x = (i) => l + (i + 0.5) * (inner / days.length) - bw / 2;
+  const y = (v) => t + (H - t - b) * (1 - v / max);
+  const tick = (v) => `<line x1="${l}" x2="${W - r}" y1="${y(v)}" y2="${y(v)}" stroke="#E3E8EE"/><text class="axis" x="${l - 6}" y="${y(v) + 4}" text-anchor="end">${Math.round(v)}</text>`;
+  const rects = days.map((d, i) => {
+    const hl = (H - b) - y(d.leads), hs = (H - b) - y(d.sales);
+    return `<g><title>${dshort(d.d)} · ${d.leads} leads · ${d.sales} compras</title>
+      <rect x="${x(i)}" y="${y(d.leads)}" width="${bw}" height="${Math.max(0, hl)}" rx="2" fill="#2036E0" fill-opacity=".85"/>
+      ${d.sales ? `<rect x="${x(i) + bw * 0.25}" y="${y(d.sales)}" width="${bw * 0.5}" height="${Math.max(0, hs)}" rx="1.5" fill="#0A8F63"/>` : ''}</g>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Leads e compras por dia">${tick(max)}${tick(max / 2)}<line x1="${l}" x2="${W - r}" y1="${H - b}" y2="${H - b}" stroke="#C9D1DB"/>${rects}
+    <text class="axis" x="${l}" y="${H - 5}">${dshort(days[0].d)}</text><text class="axis" x="${W - r}" y="${H - 5}" text-anchor="end">${dshort(days[days.length - 1].d)}</text></svg>`;
+}
+
+const DIM_TABS = [['campaign', 'Campanha'], ['adset', 'Conjunto'], ['ad', 'Anúncio'], ['channel', 'Canal'], ['origin', 'Origem']];
+
+async function pageOverview() {
+  shell('geral', `<header class="top"><div><h1>Visão geral</h1></div>${rangeBar()}</header><div id="ov"><div class="empty">Carregando…</div></div>`);
+  const r = currentRange();
+  let d;
+  try { d = await api('stats', { query: { from: r.from, to: r.to, by: S.by } }); }
+  catch (e) { if (e.message !== 'login') $('#ov').innerHTML = `<div class="note bad">${esc(e.message)}</div>`; return; }
+
+  const k = d.kpi;
+  const headline = k.leads === 0 && k.sales === 0
+    ? 'Ainda não há leads neste período.'
+    : `${int(k.leads)} ${k.leads === 1 ? 'lead entrou' : 'leads entraram'}${k.sales ? ` e ${k.sales === 1 ? 'foi registrada 1 compra' : 'foram registradas ' + int(k.sales) + ' compras'}, somando <b>${money(k.revenue)}</b>.` : '. Nenhuma compra registrada ainda.'}`;
+  const sub = k.leads ? `Dos leads deste período, ${int(k.buyers)} já compraram (${pct(k.conv)}).` : 'Conecte o WhatsApp e o site em Integrações para começar a ver a origem de cada lead.';
+
+  const totalL = d.origins.reduce((a, o) => a + o.leads, 0) || 1;
+  const totalR = d.origins.reduce((a, o) => a + o.revenue, 0);
+  const legend = ['ctwa', 'site', 'link', 'direct'].concat(d.origins.map((o) => o.k).filter((x) => !ORIGINS[x]))
+    .map((key) => d.origins.find((o) => o.k === key)).filter(Boolean)
+    .map((o) => `<div style="--c:${originOf(o.k).color}"><i></i><b>${esc(originOf(o.k).label)}</b><span class="num">${int(o.leads)} leads (${pct(o.leads / totalL)}) · ${money(o.revenue)}${totalR ? ' (' + pct(o.revenue / totalR) + ')' : ''}</span></div>`).join('');
+
+  const maxL = Math.max(1, ...d.rows.map((x) => x.leads));
+  const rows = d.rows.map((x) => `
+    <tr data-href="#/leads?dim=${d.by}&val=${encodeURIComponent(x.k)}">
+      <td><div class="trunc" title="${esc(x.k)}">${esc(x.k)}</div><span class="bar" style="width:${Math.max(2, (x.leads / maxL) * 100)}%;max-width:220px"></span></td>
+      <td class="r num">${int(x.leads)}</td><td class="r num">${int(x.buyers)}</td>
+      <td class="r num">${x.leads ? pct(x.buyers / x.leads) : '—'}</td><td class="r num">${money(x.revenue)}</td>
+    </tr>`).join('');
+
+  $('#ov').innerHTML = `
+    <section class="panel hero">
+      <h2>${headline}</h2>
+      <p class="sub">${sub}</p>
+      ${d.origins.length ? `<div class="trailbox trail">
+        <div class="trailcap"><span>Leads por origem</span><span>Receita que cada origem gerou</span></div>
+        ${trailSvg(d.origins)}
+        <div class="legend">${legend}</div>
+      </div>` : ''}
+    </section>
+    <section class="grid2">
+      <div class="panel chart"><h3>Leads e compras por dia</h3>
+        <div class="legend2"><span><i style="background:#2036E0"></i>Leads</span><span><i style="background:#0A8F63"></i>Compras</span></div>
+        ${barsSvg(d.days)}</div>
+      <div class="panel chart"><h3>Receita por dia</h3>
+        <div class="legend2"><span><i style="background:#0A8F63"></i>Pela data da compra</span></div>
+        ${lineAreaSvg(d.days, 'revenue', '#0A8F63')}</div>
+    </section>
+    <section class="panel">
+      <header><h2>Onde estão os resultados</h2>
+        <div class="seg" role="group" aria-label="Agrupar por">${DIM_TABS.map(([v, l]) => `<button type="button" data-act="by" data-v="${v}" aria-pressed="${S.by === v}">${l}</button>`).join('')}</div>
+      </header>
+      ${d.rows.length ? `<div class="tw"><table>
+        <thead><tr><th>${DIM_TABS.find((t) => t[0] === d.by)[1]}</th><th class="r">Leads</th><th class="r">Compraram</th><th class="r">Conversão</th><th class="r">Receita</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>` : '<div class="empty"><strong>Nada por aqui ainda</strong>Quando os leads chegarem, eles aparecem agrupados por este critério.</div>'}
+    </section>`;
+}
+
+/* ═════════ leads ═════════ */
+function readHashQuery() {
+  const i = location.hash.indexOf('?');
+  return new URLSearchParams(i >= 0 ? location.hash.slice(i + 1) : '');
+}
+const DIM_LABEL = { campaign: 'Campanha', adset: 'Conjunto', ad: 'Anúncio', channel: 'Canal', origin: 'Origem' };
+
+async function pageLeads() {
+  const hq = readHashQuery();
+  const F = S.leads.f;
+  if (hq.get('dim')) { F.dim = hq.get('dim'); F.val = hq.get('val') || ''; F.search = ''; F.origin = ''; F.status = ''; }
+  else if (!hq.has('keep')) { F.dim = ''; F.val = ''; }
+  const useRange = !!F.dim;
+  shell('leads', `<header class="top"><div><h1>Leads</h1></div>${useRange ? rangeBar() : ''}</header>
+    <div class="panel">
+      <header>
+        <div class="toolbar" style="flex:1">
+          <label class="sr" for="f-s">Buscar</label>
+          <input type="search" id="f-s" placeholder="Buscar por nome, telefone, e-mail ou campanha" value="${esc(F.search)}" style="max-width:340px">
+          <label class="sr" for="f-o">Origem</label>
+          <select id="f-o" style="width:auto"><option value="">Todas as origens</option>${Object.entries(ORIGINS).map(([k, o]) => `<option value="${k}" ${F.origin === k ? 'selected' : ''}>${o.label}</option>`).join('')}</select>
+          <label class="sr" for="f-t">Situação</label>
+          <select id="f-t" style="width:auto"><option value="">Todos</option><option value="won" ${F.status === 'won' ? 'selected' : ''}>Já compraram</option><option value="lead" ${F.status === 'lead' ? 'selected' : ''}>Ainda não compraram</option></select>
+        </div>
+      </header>
+      ${F.dim ? `<div style="padding:10px 20px;border-bottom:1px solid var(--line)"><span class="chip"><i></i>${DIM_LABEL[F.dim]}: ${esc(F.val)}</span> <button class="btn sm" type="button" data-act="clear-dim">Limpar filtro</button></div>` : ''}
+      <div id="lbox"></div>
+    </div>`);
+  const on = (id, ev, fn) => { const el = $('#' + id); if (el) el.addEventListener(ev, fn); };
+  let tm;
+  on('f-s', 'input', (e) => { clearTimeout(tm); tm = setTimeout(() => { F.search = e.target.value.trim(); loadLeads(true); }, 300); });
+  on('f-o', 'change', (e) => { F.origin = e.target.value; loadLeads(true); });
+  on('f-t', 'change', (e) => { F.status = e.target.value; loadLeads(true); });
+  loadLeads(true);
+}
+
+async function loadLeads(reset) {
+  const L = S.leads, F = L.f;
+  const box = $('#lbox');
+  if (!box) return;
+  if (reset) { L.rows = []; box.innerHTML = '<div class="empty">Carregando…</div>'; }
+  const query = { limit: 50, offset: L.rows.length };
+  for (const k of ['search', 'origin', 'status', 'dim', 'val']) if (F[k]) query[k] = F[k];
+  if (F.dim) { const r = currentRange(); query.from = r.from; query.to = r.to; }
+  let d;
+  try { d = await api('leads', { query }); }
+  catch (e) { if (e.message !== 'login') box.innerHTML = `<div class="note bad" style="margin:16px">${esc(e.message)}</div>`; return; }
+  L.rows = L.rows.concat(d.rows); L.total = d.total;
+  if (!L.rows.length) {
+    box.innerHTML = '<div class="empty"><strong>Nenhum lead encontrado</strong>Ajuste os filtros ou confira se o webhook do WhatsApp está ativo em Integrações.</div>';
+    return;
+  }
+  box.innerHTML = `<div class="tw"><table>
+    <thead><tr><th>Lead</th><th>Origem</th><th>Campanha e anúncio</th><th>Etapa</th><th class="r">Receita</th><th>Entrou em</th></tr></thead>
+    <tbody>${L.rows.map((x) => `<tr data-href="#/lead/${x.id}">
+      <td><strong>${esc(x.name || fmtPhone(x.phone) || x.email || 'Sem nome')}</strong>${x.name && x.phone ? `<span class="cell-sub">${esc(fmtPhone(x.phone))}</span>` : ''}</td>
+      <td>${chip(x.origin)}${x.channel && x.channel !== x.origin ? `<span class="cell-sub">${esc(x.channel)}</span>` : ''}</td>
+      <td><div class="trunc">${esc(x.utm_campaign || '—')}</div><span class="cell-sub trunc">${esc(x.utm_content || x.ad_headline || x.ad_id || '')}</span></td>
+      <td>${esc(x.stage || '—')}${x.status === 'won' ? ' <span class="chip" style="--c:var(--green)"><i></i>Cliente</span>' : ''}</td>
+      <td class="r num">${x.revenue ? money(x.revenue) : '—'}</td>
+      <td class="num">${dt(x.created_at)}</td></tr>`).join('')}</tbody></table></div>
+    <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line)">
+      <span class="muted">Mostrando ${int(L.rows.length)} de ${int(L.total)}</span>
+      ${L.rows.length < L.total ? '<button class="btn" type="button" data-act="more">Mostrar mais</button>' : ''}</div>`;
+}
+
+/* ═════════ ficha do lead ═════════ */
+const TOUCH = { pageview: 'Visitou a página', wa_click: 'Clicou no botão de WhatsApp', link_click: 'Clicou no link rastreado', form: 'Enviou um formulário' };
+
+function describeEvent(e) {
+  const d = e.data || {};
+  switch (e.type) {
+    case 'lead_created': return { cls: '', t: 'Entrou como lead', s: [d.fonte ? 'Pelo ' + d.fonte : '', d.mensagem ? '“' + d.mensagem + '”' : ''].filter(Boolean).join(' · ') };
+    case 'attribution_set': return { cls: '', t: 'Origem identificada', s: originOf(d.origem).label + (d.ad_id ? ' · anúncio ' + d.ad_id : '') };
+    case 'ghl_sync': return { cls: '', t: 'Enviado ao GoHighLevel', s: d.contact_id ? 'Contato ' + d.contact_id : '' };
+    case 'ghl_error': return { cls: 'bad', t: 'Falha ao enviar ao GoHighLevel', s: d.erro || '' };
+    case 'meta_sent': return { cls: 'meta', t: 'Voltou para a Meta: ' + (d.evento || ''), s: [d.valor != null ? money(d.valor) : '', d.action_source ? 'origem do evento: ' + d.action_source : '', d.teste ? 'modo de teste' : ''].filter(Boolean).join(' · ') };
+    case 'meta_error': return { cls: 'bad', t: 'Falha ao enviar para a Meta' + (d.evento ? ' (' + d.evento + ')' : ''), s: (d.resposta && d.resposta.error && d.resposta.error.message) || d.erro || '' };
+    case 'stage_change': return { cls: '', t: 'Etapa no funil: ' + (d.etapa || '—'), s: '' };
+    case 'purchase': return { cls: 'money', t: 'Compra de ' + money(d.value), s: d.etapa || '' };
+    case 'crm_event': return { cls: '', t: 'Evento no CRM: ' + (d.evento || ''), s: d.etapa || '' };
+    default: return { cls: '', t: e.type, s: '' };
+  }
+}
+
+async function pageLead(id) {
+  shell('leads', '<div class="empty">Carregando…</div>');
+  let d;
+  try { d = await api('lead', { query: { id } }); }
+  catch (e) { if (e.message !== 'login') $('#main').innerHTML = `<a class="back" href="#/leads">← Leads</a><div class="note bad">${esc(e.message)}</div>`; return; }
+  const l = d.lead;
+
+  const items = [];
+  d.touches.forEach((t) => {
+    const bits = [];
+    try { if (t.url) { const u = new URL(t.url, location.origin); bits.push(u.hostname.replace(/^www\./, '') + u.pathname); } } catch (_) { /* ignora */ }
+    if (t.utm_campaign) bits.push(t.utm_campaign + (t.utm_content ? ' · ' + t.utm_content : ''));
+    else if (t.channel && t.channel !== 'direto') bits.push(t.channel);
+    if (t.ref_code) bits.push('código ' + t.ref_code);
+    items.push({ at: t.created_at, cls: 'touch', t: TOUCH[t.type] || t.type, s: bits.join(' · ') });
+  });
+  d.events.forEach((e) => { const x = describeEvent(e); items.push({ at: e.created_at, ...x }); });
+  items.sort((a, b) => new Date(a.at) - new Date(b.at));
+
+  const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
+  $('#main').innerHTML = `
+    <a class="back" href="#/leads">← Leads</a>
+    <div class="lead-head">
+      <div><h1>${esc(l.name || fmtPhone(l.phone) || l.email || 'Lead')}</h1>
+        <p class="muted" style="margin:4px 0 0">${[l.phone ? fmtPhone(l.phone) : '', l.email].filter(Boolean).map(esc).join(' · ')}</p></div>
+      <div class="toolbar">${chip(l.origin)}${l.status === 'won' ? `<span class="chip" style="--c:var(--green)"><i></i>Cliente · ${money(l.revenue)}</span>` : ''}
+        <button class="btn danger sm" type="button" data-act="del-lead" data-id="${l.id}">Apagar lead</button></div>
+    </div>
+    <div class="lead-grid">
+      <section class="panel">
+        <header><h2>De onde veio</h2></header>
+        <div class="pad"><dl class="kv">
+          ${row('Origem', originOf(l.origin).label)}${row('Canal', l.channel)}${row('Campanha', l.utm_campaign)}${row('Conjunto', l.utm_term)}
+          ${row('Anúncio', l.utm_content || l.ad_headline)}${row('ID do anúncio', l.ad_id)}${row('Página', l.landing_url)}
+          ${row('Link rastreado', l.link_slug)}${row('Código da conversa', l.ref_code)}${row('Clique (ctwa)', l.ctwa_clid)}
+          ${row('Etapa no funil', l.stage)}${row('Contato no GHL', l.ghl_contact_id)}${row('Primeira mensagem', l.first_message)}${row('Entrou em', dt(l.created_at))}
+        </dl></div>
+      </section>
+      <section class="panel">
+        <header><h2>Jornada</h2><span class="muted">${items.length} registros</span></header>
+        ${items.length ? `<ol class="tl">${items.map((i) => `<li class="${i.cls}"><div class="t">${esc(i.t)}</div>${i.s ? `<div class="s">${esc(i.s)}</div>` : ''}<time datetime="${esc(i.at)}">${dt(i.at)}</time></li>`).join('')}</ol>` : '<div class="empty">Sem registros.</div>'}
+      </section>
+    </div>`;
+}
+
+/* ═════════ links rastreados ═════════ */
+const CHANNELS = [['bio', 'Link da bio'], ['youtube', 'YouTube'], ['stories', 'Stories'], ['status', 'Status do WhatsApp'], ['email', 'E-mail'], ['outro', 'Outro']];
+let linkKind = 'whatsapp';
+
+async function pageLinks() {
+  shell('links', `<header class="top"><div><h1>Links rastreados</h1><p>Crie um link por lugar onde você divulga. Cada conversa e venda volta para o link certo, em vez de cair como “orgânico”.</p></div></header>
+    <div class="cols">
+      <form class="panel pad" id="link-form">
+        <h2 style="margin-bottom:14px">Novo link</h2>
+        <label class="f"><span>Nome</span><input type="text" id="l-name" placeholder="Ex.: Bio do Instagram" required maxlength="80"></label>
+        <label class="f"><span>Onde você vai divulgar</span><select id="l-ch">${CHANNELS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label>
+        <div class="f" style="margin-bottom:12px"><span style="display:block;margin-bottom:5px;font-weight:500">Leva para</span>
+          <div class="seg" role="group"><button type="button" data-act="kind" data-v="whatsapp" aria-pressed="true">WhatsApp</button><button type="button" data-act="kind" data-v="url" aria-pressed="false">Uma página</button></div></div>
+        <div id="kind-wa">
+          <label class="f"><span>Número do WhatsApp</span><input type="text" id="l-phone" placeholder="(77) 99999-0000" inputmode="tel"></label>
+          <label class="f"><span>Mensagem inicial</span><input type="text" id="l-msg" placeholder="Olá! Vim pelo Instagram." maxlength="300"><small>O código de rastreio é adicionado ao final da mensagem.</small></label>
+        </div>
+        <div id="kind-url" hidden>
+          <label class="f"><span>Endereço da página</span><input type="url" id="l-url" placeholder="https://seusite.com.br/pagina"><small>A página precisa ter o script do Rastro instalado.</small></label>
+        </div>
+        <button class="btn primary" type="submit" style="width:100%">Criar link</button>
+        <div class="err" id="l-err" role="alert"></div>
+      </form>
+      <section class="panel" id="links-box"><div class="empty">Carregando…</div></section>
+    </div>`);
+  linkKind = 'whatsapp';
+  $('#link-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('#link-form button[type=submit]'); btn.disabled = true; $('#l-err').textContent = '';
+    try {
+      await api('links', { method: 'POST', body: {
+        name: $('#l-name').value, channel: $('#l-ch').value, kind: linkKind,
+        wa_phone: $('#l-phone').value, wa_message: $('#l-msg').value, destination: $('#l-url').value,
+      } });
+      toast('Link criado'); pageLinks();
+    } catch (err) { if (err.message !== 'login') { $('#l-err').textContent = err.message; btn.disabled = false; } }
+  });
+  loadLinks();
+}
+
+async function loadLinks() {
+  const box = $('#links-box'); if (!box) return;
+  let d;
+  try { d = await api('links'); } catch (e) { if (e.message !== 'login') box.innerHTML = `<div class="note bad" style="margin:16px">${esc(e.message)}</div>`; return; }
+  if (!d.rows.length) { box.innerHTML = '<div class="empty"><strong>Nenhum link ainda</strong>Crie o primeiro ao lado e cole na bio, na descrição do vídeo ou nos stories.</div>'; return; }
+  box.innerHTML = `<div class="tw"><table>
+    <thead><tr><th>Link</th><th class="r">Cliques</th><th class="r">Leads</th><th class="r">Compraram</th><th class="r">Receita</th><th></th></tr></thead>
+    <tbody>${d.rows.map((x) => {
+      const url = location.origin + '/l/' + x.slug;
+      return `<tr><td><strong>${esc(x.name)}</strong> <span class="chip" style="--c:var(--o-link)"><i></i>${esc(x.channel || 'link')}</span>
+        <span class="cell-sub trunc" title="${esc(url)}">${esc(url)}</span>
+        <span class="cell-sub trunc">${x.kind === 'whatsapp' ? 'WhatsApp ' + esc(fmtPhone(x.wa_phone)) : esc(x.destination)}</span></td>
+        <td class="r num">${int(x.clicks)}</td><td class="r num">${int(x.leads)}</td><td class="r num">${int(x.buyers)}</td><td class="r num">${x.revenue ? money(x.revenue) : '—'}</td>
+        <td style="white-space:nowrap"><button class="btn sm" type="button" data-act="copy" data-v="${esc(url)}">Copiar</button> <button class="btn sm danger" type="button" data-act="del-link" data-slug="${esc(x.slug)}">Apagar</button></td></tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+/* ═════════ anúncios ═════════ */
+async function pageAds() {
+  shell('anuncios', `<header class="top"><div><h1>Anúncios</h1><p>Quanto cada anúncio gastou e quanto voltou em vendas.</p></div>${rangeBar()}</header><div id="ads"><div class="empty">Carregando…</div></div>`);
+  const r = currentRange();
+  let d;
+  try { d = await api('ads', { query: { from: r.from, to: r.to } }); }
+  catch (e) { if (e.message !== 'login') $('#ads').innerHTML = `<div class="note bad">${esc(e.message)}</div>`; return; }
+  const note = !d.metaConfigured
+    ? `<div class="note warn">O gasto não aparece porque a Meta Ads ainda não está conectada. Defina <b>META_ADS_TOKEN</b> e <b>META_AD_ACCOUNT_ID</b> na Vercel para ver gasto, custo por lead e retorno por anúncio.</div>`
+    : d.metaError ? `<div class="note bad">Não foi possível buscar o gasto na Meta: ${esc(d.metaError)}</div>` : '';
+  const dash = (v, f) => (v == null || !isFinite(v) ? '—' : f(v));
+  $('#ads').innerHTML = note + (d.rows.length ? `<section class="panel"><div class="tw"><table>
+    <thead><tr><th>Anúncio</th><th class="r">Gasto</th><th class="r">Leads</th><th class="r">Custo por lead</th><th class="r">Compraram</th><th class="r">Custo por venda</th><th class="r">Receita</th><th class="r">Retorno</th></tr></thead>
+    <tbody>${d.rows.map((x) => `<tr data-href="#/leads?dim=ad&val=${encodeURIComponent(x.ad_name || x.ad_id)}">
+      <td><div class="trunc" title="${esc(x.ad_name || x.ad_id)}"><strong>${esc(x.ad_name || x.ad_id)}</strong></div><span class="cell-sub trunc">${esc([x.campaign, x.adset].filter(Boolean).join(' · '))}</span></td>
+      <td class="r num">${dash(x.spend, money)}</td><td class="r num">${int(x.leads)}</td><td class="r num">${dash(x.cpl, money)}</td>
+      <td class="r num">${int(x.buyers)}</td><td class="r num">${dash(x.cac, money)}</td><td class="r num">${x.revenue ? money(x.revenue) : '—'}</td>
+      <td class="r num"><strong>${dash(x.roas, (v) => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + '×')}</strong></td></tr>`).join('')}</tbody></table></div></section>`
+    : '<div class="panel empty"><strong>Nenhum anúncio com leads neste período</strong>Leads de anúncios de WhatsApp aparecem aqui automaticamente. Para anúncios que levam ao site, use os parâmetros de URL de Integrações.</div>');
+}
+
+/* ═════════ integrações ═════════ */
+function codeBlock(text) { return `<div class="codeblock">${esc(text)}<button class="btn sm" type="button" data-act="copy" data-v="${esc(text)}">Copiar</button></div>`; }
+
+async function pageSettings() {
+  shell('integracoes', `<header class="top"><div><h1>Integrações</h1><p>Tudo o que você precisa ligar para o rastreio funcionar.</p></div></header><div id="set"><div class="empty">Carregando…</div></div>`);
+  let s, lg;
+  try { [s, lg] = await Promise.all([api('settings'), api('logs')]); }
+  catch (e) { if (e.message !== 'login') $('#set').innerHTML = `<div class="note bad">${esc(e.message)}</div>`; return; }
+  const o = location.origin;
+  const key = 'SEU_WEBHOOK_SECRET';
+  const st = (ok, title, text, bad) => `<div class="status ${ok ? '' : bad ? 'bad' : 'off'}"><i></i><strong>${title}</strong><span>${text}</span></div>`;
+  const hook = (n) => s.hooks[n] ? `${int(s.hooks[n].n)} recebidos, o último em ${dt(s.hooks[n].last)}` : 'Nenhum recebido ainda';
+  const script = `<script async src="${o}/t.js" data-forms><\/script>`;
+  const utm = 'utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}&ad_id={{ad.id}}&adset_id={{adset.id}}&campaign_id={{campaign.id}}';
+
+  $('#set').innerHTML = `<div class="stack">
+    <section class="panel pad">
+      <h2 style="margin-bottom:6px">Situação</h2>
+      ${st(s.vars.ADMIN_PASSWORD && s.vars.WEBHOOK_SECRET, 'Segurança', s.vars.WEBHOOK_SECRET ? 'Senha do painel e chave dos webhooks definidas.' : 'Defina WEBHOOK_SECRET na Vercel. Sem ela, os webhooks recusam tudo.', !s.vars.WEBHOOK_SECRET)}
+      ${st(s.hooks.stevo, 'WhatsApp (Stevo)', hook('stevo'))}
+      ${st(s.ghl.configured, 'GoHighLevel · envio da origem', s.ghl.configured ? `Conectado${s.ghl.custom_fields ? ` · ${s.ghl.custom_fields} campos personalizados` : ' · sem campos personalizados (usa só tags)'}.` : 'Defina GHL_TOKEN e GHL_LOCATION_ID.')}
+      ${st(s.hooks.ghl, 'GoHighLevel · eventos de funil e compra', hook('ghl'))}
+      ${st(s.meta.capi, 'Meta · API de Conversões', s.meta.capi ? (s.meta.test_mode ? 'Conectada em modo de teste (META_TEST_EVENT_CODE). Remova antes de valer de verdade.' : 'Conectada.') + (s.meta.waba ? ' Conversões de mensagem ativas (WABA informada).' : ' Sem META_WABA_ID: vendas de anúncio de WhatsApp saem como “chat”.') : 'Defina META_PIXEL_ID e META_CAPI_TOKEN.')}
+      ${st(s.meta.ads, 'Meta · gasto dos anúncios', s.meta.ads ? 'Conectada.' : 'Defina META_ADS_TOKEN e META_AD_ACCOUNT_ID.')}
+    </section>
+
+    <section class="panel">
+      <div class="sect"><h3>1. Script do site</h3>
+        <p>Cole no <code>&lt;head&gt;</code> de cada site e página de vendas. Ele registra a visita e acrescenta o código de rastreio nos botões de WhatsApp. Com <code>data-forms</code>, captura também formulários com telefone ou e-mail.</p>
+        ${codeBlock(script)}</div>
+      <div class="sect"><h3>2. Webhook do WhatsApp (Stevo)</h3>
+        <p>No Stevo, cadastre este endereço como webhook de mensagens recebidas. Troque <code>${key}</code> pelo valor de WEBHOOK_SECRET.</p>
+        ${codeBlock(`${o}/api/webhook-stevo?key=${key}`)}</div>
+      <div class="sect"><h3>3. Webhooks do GoHighLevel</h3>
+        <p>Em cada workflow do GHL, adicione a ação <b>Webhook</b> (POST) com a URL do evento. O corpo padrão do GHL já traz telefone, e-mail e nome. Para compras, inclua o valor no corpo como <code>value</code> ou na URL.</p>
+        <span class="lbl">Contato criado ou qualificado</span>${codeBlock(`${o}/api/webhook-ghl?key=${key}&event=lead`)}
+        <span class="lbl">Mudou de etapa no funil (envie o nome da etapa em <code>stage</code>)</span>${codeBlock(`${o}/api/webhook-ghl?key=${key}&event=stage`)}
+        <span class="lbl">Agendou</span>${codeBlock(`${o}/api/webhook-ghl?key=${key}&event=schedule`)}
+        <span class="lbl">Comprou (oportunidade ganha)</span>${codeBlock(`${o}/api/webhook-ghl?key=${key}&event=purchase`)}</div>
+      <div class="sect"><h3>4. Parâmetros dos anúncios que levam ao site</h3>
+        <p>No Gerenciador de Anúncios, em “Parâmetros de URL”, cole isto. Anúncios de clique para WhatsApp não precisam: o próprio WhatsApp envia os dados do anúncio.</p>
+        ${codeBlock(utm)}</div>
+      <div class="sect"><h3>5. Testar a Meta</h3>
+        <p>Envia um evento “Lead” de teste. Ele aparece em Gerenciador de Eventos &gt; Testar eventos quando META_TEST_EVENT_CODE estiver definido.</p>
+        <button class="btn" type="button" data-act="test-meta" ${s.meta.capi ? '' : 'disabled'}>Enviar evento de teste</button>
+        <pre id="meta-out" class="codeblock" style="margin-top:10px;padding-right:14px" hidden></pre></div>
+    </section>
+
+    <section class="panel">
+      <header><div><h2>Últimos webhooks recebidos</h2><div class="muted" style="font-size:14px">Use para conferir o formato real que o Stevo e o GHL enviam.</div></div></header>
+      ${lg.rows.length ? lg.rows.map((x) => `<details class="log"><summary><strong>${esc(x.source)}</strong><span>${esc(x.status)}</span><span class="muted">${dt(x.created_at)}</span></summary><pre>${esc(JSON.stringify(x.payload, null, 2))}</pre></details>`).join('') : '<div class="empty">Nenhum webhook recebido ainda.</div>'}
+    </section></div>`;
+}
+
+/* ═════════ roteamento e eventos ═════════ */
+async function route() {
+  let ok = false;
+  try { const r = await fetch('/api/auth', { credentials: 'same-origin' }); ok = (await r.json()).ok; } catch (_) { /* ignora */ }
+  if (!ok) return renderLogin();
+  const path = (location.hash.replace(/^#\/?/, '').split('?')[0]) || 'geral';
+  const [page, arg] = path.split('/');
+  if (page === 'leads') return pageLeads();
+  if (page === 'lead' && arg) return pageLead(arg);
+  if (page === 'links') return pageLinks();
+  if (page === 'anuncios') return pageAds();
+  if (page === 'integracoes') return pageSettings();
+  return pageOverview();
+}
+
+function rerender() { route(); }
+
+document.addEventListener('click', async (e) => {
+  const tr = e.target.closest('tr[data-href]');
+  const el = e.target.closest('[data-act]');
+  if (!el && tr && !e.target.closest('a,button')) { location.hash = tr.dataset.href; return; }
+  if (!el) return;
+  const act = el.dataset.act;
+  if (act === 'preset') { S.preset = el.dataset.v; rerender(); }
+  else if (act === 'by') { S.by = el.dataset.v; rerender(); }
+  else if (act === 'copy') copy(el.dataset.v);
+  else if (act === 'more') { el.disabled = true; loadLeads(false); }
+  else if (act === 'clear-dim') {
+    S.leads.f.dim = ''; S.leads.f.val = '';
+    if (location.hash === '#/leads?keep=1') rerender(); else location.hash = '#/leads?keep=1';
+  }
+  else if (act === 'kind') {
+    linkKind = el.dataset.v;
+    document.querySelectorAll('[data-act=kind]').forEach((b) => b.setAttribute('aria-pressed', String(b === el)));
+    $('#kind-wa').hidden = linkKind !== 'whatsapp'; $('#kind-url').hidden = linkKind !== 'url';
+  }
+  else if (act === 'del-link') {
+    if (!confirm('Apagar este link? Quem já o recebeu vai ver “Link não encontrado”.')) return;
+    try { await api('links', { method: 'DELETE', query: { slug: el.dataset.slug } }); toast('Link apagado'); loadLinks(); } catch (err) { if (err.message !== 'login') toast(err.message); }
+  }
+  else if (act === 'del-lead') {
+    if (!confirm('Apagar este lead e todo o histórico dele? Isso não pode ser desfeito.')) return;
+    try { await api('lead', { method: 'DELETE', query: { id: el.dataset.id } }); toast('Lead apagado'); location.hash = '#/leads?keep=1'; } catch (err) { if (err.message !== 'login') toast(err.message); }
+  }
+  else if (act === 'test-meta') {
+    el.disabled = true;
+    const out = $('#meta-out');
+    try {
+      const r = await api('test-meta', { method: 'POST' });
+      out.hidden = false; out.textContent = JSON.stringify(r.response || r, null, 2);
+      toast(r.ok ? 'Evento enviado' : 'A Meta recusou o evento');
+    } catch (err) { if (err.message !== 'login') toast(err.message); }
+    el.disabled = false;
+  }
+  else if (act === 'logout') {
+    await fetch('/api/auth?action=logout', { method: 'POST' });
+    renderLogin();
+  }
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'd-from' || e.target.id === 'd-to') {
+    const f = $('#d-from').value, t = $('#d-to').value;
+    if (f && t && f <= t) { S.preset = 'custom'; S.from = f; S.to = t; rerender(); }
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { const tr = e.target.closest && e.target.closest('tr[data-href]'); if (tr) location.hash = tr.dataset.href; }
+});
+
+window.addEventListener('hashchange', route);
+route();
+})();
+</script>
+</body>
+</html>
